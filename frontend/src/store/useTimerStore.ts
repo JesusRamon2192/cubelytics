@@ -146,6 +146,8 @@ export const useTimerStore = create<TimerStore>((set, get) => ({
             await get().fetchStats();
         } catch (e) {
             console.error("Failed to save solve", e);
+            // Revert optimistic save on failure
+            set((state) => ({ solves: state.solves.filter(s => s.id !== tempSolve.id) }));
         }
     },
 
