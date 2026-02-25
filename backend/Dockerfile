@@ -9,6 +9,7 @@ RUN ./mvnw clean package -DskipTests
 
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
+RUN wget -O /app/newrelic.jar https://download.newrelic.com/newrelic/java-agent/newrelic-agent/current/newrelic.jar
 COPY --from=builder /app/target/*.jar app.jar
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-javaagent:/app/newrelic.jar", "-jar", "app.jar"]
