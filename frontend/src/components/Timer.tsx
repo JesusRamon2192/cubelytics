@@ -4,10 +4,17 @@ import { formatTime } from '../utils/timeFormat';
 
 export const Timer: React.FC = () => {
     const {
-        state, scramble, currentTime,
+        state, scramble, scrambleImage, currentTime,
         startSolve, stopSolve, markSplit, resetTimer,
         currentPhase, crossTime, f2lTime, ollTime, pllTime
     } = useTimerStore();
+
+    // Fetch initial scramble on mount
+    useEffect(() => {
+        if (scramble === 'Loading...') {
+            useTimerStore.getState().nextScramble();
+        }
+    }, [scramble]);
 
     const [displayTime, setDisplayTime] = useState(0);
     const lastToggleTime = useRef(0);
@@ -69,9 +76,21 @@ export const Timer: React.FC = () => {
     return (
         <div className="timer-section">
             <div className="scramble-display">{scramble}</div>
-
-            <div className={`time-display ${state === 'READY' ? 'ready' : ''}`}>
-                {formatTime(displayTime)}
+            
+            <div className="timer-layout">
+                <div className="cube-image-container">
+                    {scrambleImage && (
+                        <img 
+                            src={scrambleImage} 
+                            alt="Scramble visualization" 
+                            className="cube-image"
+                        />
+                    )}
+                </div>
+                <div className={`time-display ${state === 'READY' ? 'ready' : ''}`}>
+                    {formatTime(displayTime)}
+                </div>
+                <div className="timer-layout-spacer"></div>
             </div>
 
             <div className="splits-container">

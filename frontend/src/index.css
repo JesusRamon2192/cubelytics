@@ -115,6 +115,28 @@ body {
   color: var(--success-color);
 }
 
+.timer-layout {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  width: 100%;
+}
+
+.cube-image-container {
+  justify-self: end;
+  padding-right: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cube-image {
+  opacity: 0.8;
+  /* VisualCube SVG sometimes has padding, so we can control size */
+  max-width: 150px;
+  max-height: 150px;
+}
+
 .splits-container {
   display: flex;
   gap: 1rem;

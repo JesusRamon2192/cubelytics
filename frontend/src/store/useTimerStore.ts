@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import type { Solve, Stats, CreateSolveDto, Penalty } from '../types';
 import { apiClient } from '../api/apiClient';
-import { generateScramble } from '../utils/scrambler';
+import { fetchScramble } from '../api/scrambleService';
 
 export type TimerState = 'IDLE' | 'INSPECTING' | 'READY' | 'SOLVING' | 'STOPPED';
 export type Phase = 'CROSS' | 'F2L' | 'OLL' | 'PLL' | 'DONE';
@@ -9,6 +9,7 @@ export type Phase = 'CROSS' | 'F2L' | 'OLL' | 'PLL' | 'DONE';
 interface TimerStore {
     state: TimerState;
     scramble: string;
+    scrambleImage: string;
     solves: Solve[];
     stats: Stats | null;
 
@@ -42,7 +43,8 @@ interface TimerStore {
 
 export const useTimerStore = create<TimerStore>((set, get) => ({
     state: 'IDLE',
-    scramble: generateScramble(),
+    scramble: 'Loading...',
+    scrambleImage: '',
     solves: [],
     stats: null,
 
@@ -58,7 +60,10 @@ export const useTimerStore = create<TimerStore>((set, get) => ({
 
     setState: (s) => set({ state: s }),
 
-    nextScramble: () => set({ scramble: generateScramble() }),
+    nextScramble: async () => {
+        const data = await fetchScramble();
+        set({ scramble: data.scramble, scrambleImage: data.imagen });
+    },
 
     startInspection: () => {
         set({
