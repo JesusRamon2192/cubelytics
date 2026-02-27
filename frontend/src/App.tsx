@@ -1,22 +1,64 @@
-// React import not needed 
+import { useEffect } from 'react';
+import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import { Timer } from './components/Timer';
 import { Stats } from './components/Stats';
 import { History } from './components/History';
+import AnalyticsPage from './features/analytics/AnalyticsPage';
+import { ThemeSelector } from './components/ThemeSelector';
+import { useThemeStore } from './theme/useTheme';
+
+function TimerLayout() {
+  return (
+    <>
+      <Timer />
+      <aside className="sidebar">
+        <Stats />
+        <History />
+      </aside>
+    </>
+  );
+}
 
 function App() {
+  const location = useLocation();
+  const isAnalytics = location.pathname === '/analytics';
+  const { initTheme } = useThemeStore();
+
+  useEffect(() => {
+    initTheme();
+  }, [initTheme]);
+
   return (
     <div className="app-container">
       <header className="header">
-        <h1>Twisty Timer PRO</h1>
-        <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>CFOP Training</div>
+        <div className="header-container">
+          <div>
+            <h1>CubeLytics</h1>
+            <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>CFOP Training</div>
+          </div>
+          <nav className="nav-links">
+            <Link 
+              to="/" 
+              className={`nav-link ${!isAnalytics ? 'active' : 'inactive'}`}
+            >
+              Timer
+            </Link>
+            <Link 
+              to="/analytics" 
+              className={`nav-link ${isAnalytics ? 'active' : 'inactive'}`}
+            >
+              Analytics
+            </Link>
+            <ThemeSelector />
+          </nav>
+        </div>
       </header>
 
       <main className="main-content">
-        <Timer />
-        <aside className="sidebar">
-          <Stats />
-          <History />
-        </aside>
+        <Routes>
+          <Route path="/" element={<TimerLayout />} />
+          <Route path="/analytics" element={<AnalyticsPage />} />
+        </Routes>
       </main>
     </div>
   );

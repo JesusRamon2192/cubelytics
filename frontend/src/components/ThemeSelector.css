@@ -1,0 +1,118 @@
+.theme-selector {
+  position: relative;
+  display: inline-block;
+}
+
+.theme-btn {
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.theme-btn:hover {
+  background: var(--surface-hover);
+  color: var(--text-primary);
+  border-color: rgba(187, 134, 252, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.theme-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  width: 200px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  z-index: 50;
+  overflow: hidden;
+  animation: fadeSlideDown 0.2s ease-out;
+}
+
+.theme-dropdown-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-color);
+  font-family: 'Sora', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.theme-option {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 12px 16px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  color: var(--text-secondary);
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.theme-option:last-child {
+  border-bottom: none;
+}
+
+.theme-option:hover {
+  background: var(--surface-hover);
+  color: var(--text-primary);
+}
+
+.theme-option.active {
+  background: rgba(187, 134, 252, 0.08); /* fallback */
+  color: var(--accent-color);
+}
+
+.theme-preview {
+  display: flex;
+  gap: 4px;
+  margin-right: 12px;
+}
+
+.color-circle {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.theme-name {
+  flex: 1;
+}
+
+.theme-check {
+  color: var(--accent-color);
+}
+
+@keyframes fadeSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
