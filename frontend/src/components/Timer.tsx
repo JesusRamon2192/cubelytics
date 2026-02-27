@@ -12,7 +12,8 @@ export const Timer: React.FC = () => {
         state, scramble, scrambleImage, currentTime,
         startSolve, stopSolve, markSplit, resetTimer,
         currentPhase, crossTime, f2lTime, ollTime, pllTime,
-        stats, fetchStats, solves, updatePenalty, deleteSolve
+        stats, fetchStats, solves, updatePenalty, deleteSolve,
+        splitMode
     } = useTimerStore();
 
     // Fetch initial scramble and stats on mount
@@ -33,7 +34,7 @@ export const Timer: React.FC = () => {
                 onTriggerStart={handleTriggerStart} 
                 onTriggerEnd={handleTriggerEnd}
             >
-                <div className="timer-layout">
+                <div className={`timer-layout ${splitMode && state === 'SOLVING' ? 'training' : ''}`}>
                     <div className="cube-image-container">
                         {scrambleImage && (
                             <img 
@@ -97,46 +98,50 @@ export const Timer: React.FC = () => {
             )}
 
             {/* Desktop Splits */}
-            <div className="splits-container desktop-splits">
-                <div className={`split-item ${currentPhase === 'CROSS' ? 'active' : ''}`} style={{ opacity: currentPhase === 'CROSS' || crossTime ? 1 : 0.5 }}>
-                    <span className="split-label">Cross</span>
-                    <span className="split-time">{formatTime(crossTime)}</span>
+            {splitMode && (
+                <div className="splits-container desktop-splits">
+                    <div className={`split-item ${currentPhase === 'CROSS' ? 'active' : ''}`} style={{ opacity: currentPhase === 'CROSS' || crossTime ? 1 : 0.5 }}>
+                        <span className="split-label">Cross</span>
+                        <span className="split-time">{formatTime(crossTime)}</span>
+                    </div>
+                    <div className={`split-item ${currentPhase === 'F2L' ? 'active' : ''}`} style={{ opacity: currentPhase === 'F2L' || f2lTime ? 1 : 0.5 }}>
+                        <span className="split-label">F2L</span>
+                        <span className="split-time">{formatTime(f2lTime)}</span>
+                    </div>
+                    <div className={`split-item ${currentPhase === 'OLL' ? 'active' : ''}`} style={{ opacity: currentPhase === 'OLL' || ollTime ? 1 : 0.5 }}>
+                        <span className="split-label">OLL</span>
+                        <span className="split-time">{formatTime(ollTime)}</span>
+                    </div>
+                    <div className={`split-item ${currentPhase === 'PLL' ? 'active' : ''}`} style={{ opacity: currentPhase === 'PLL' || pllTime ? 1 : 0.5 }}>
+                        <span className="split-label">PLL</span>
+                        <span className="split-time">{formatTime(pllTime)}</span>
+                    </div>
                 </div>
-                <div className={`split-item ${currentPhase === 'F2L' ? 'active' : ''}`} style={{ opacity: currentPhase === 'F2L' || f2lTime ? 1 : 0.5 }}>
-                    <span className="split-label">F2L</span>
-                    <span className="split-time">{formatTime(f2lTime)}</span>
-                </div>
-                <div className={`split-item ${currentPhase === 'OLL' ? 'active' : ''}`} style={{ opacity: currentPhase === 'OLL' || ollTime ? 1 : 0.5 }}>
-                    <span className="split-label">OLL</span>
-                    <span className="split-time">{formatTime(ollTime)}</span>
-                </div>
-                <div className={`split-item ${currentPhase === 'PLL' ? 'active' : ''}`} style={{ opacity: currentPhase === 'PLL' || pllTime ? 1 : 0.5 }}>
-                    <span className="split-label">PLL</span>
-                    <span className="split-time">{formatTime(pllTime)}</span>
-                </div>
-            </div>
+            )}
 
             {/* Mobile Combined Grid */}
-            <div className="mobile-cfop-grid glass-panel">
-                <table className="mobile-grid-table">
-                    <thead>
-                        <tr>
-                            <th className={currentPhase === 'CROSS' ? 'active-header' : ''}>CROSS</th>
-                            <th className={currentPhase === 'F2L' ? 'active-header' : ''}>F2L</th>
-                            <th className={currentPhase === 'OLL' ? 'active-header' : ''}>OLL</th>
-                            <th className={currentPhase === 'PLL' ? 'active-header' : ''}>PLL</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr className="split-times-row">
-                            <td className={currentPhase === 'CROSS' ? 'active-cell' : ''} style={{ opacity: currentPhase === 'CROSS' || crossTime ? 1 : 0.5 }}>{formatTime(crossTime)}</td>
-                            <td className={currentPhase === 'F2L' ? 'active-cell' : ''} style={{ opacity: currentPhase === 'F2L' || f2lTime ? 1 : 0.5 }}>{formatTime(f2lTime)}</td>
-                            <td className={currentPhase === 'OLL' ? 'active-cell' : ''} style={{ opacity: currentPhase === 'OLL' || ollTime ? 1 : 0.5 }}>{formatTime(ollTime)}</td>
-                            <td className={currentPhase === 'PLL' ? 'active-cell' : ''} style={{ opacity: currentPhase === 'PLL' || pllTime ? 1 : 0.5 }}>{formatTime(pllTime)}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+            {splitMode && (
+                <div className="mobile-cfop-grid glass-panel">
+                    <table className="mobile-grid-table">
+                        <thead>
+                            <tr>
+                                <th className={currentPhase === 'CROSS' ? 'active-header' : ''}>CROSS</th>
+                                <th className={currentPhase === 'F2L' ? 'active-header' : ''}>F2L</th>
+                                <th className={currentPhase === 'OLL' ? 'active-header' : ''}>OLL</th>
+                                <th className={currentPhase === 'PLL' ? 'active-header' : ''}>PLL</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr className="split-times-row">
+                                <td className={currentPhase === 'CROSS' ? 'active-cell' : ''} style={{ opacity: currentPhase === 'CROSS' || crossTime ? 1 : 0.5 }}>{formatTime(crossTime)}</td>
+                                <td className={currentPhase === 'F2L' ? 'active-cell' : ''} style={{ opacity: currentPhase === 'F2L' || f2lTime ? 1 : 0.5 }}>{formatTime(f2lTime)}</td>
+                                <td className={currentPhase === 'OLL' ? 'active-cell' : ''} style={{ opacity: currentPhase === 'OLL' || ollTime ? 1 : 0.5 }}>{formatTime(ollTime)}</td>
+                                <td className={currentPhase === 'PLL' ? 'active-cell' : ''} style={{ opacity: currentPhase === 'PLL' || pllTime ? 1 : 0.5 }}>{formatTime(pllTime)}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            )}
         </div>
     );
 };

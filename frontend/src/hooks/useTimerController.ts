@@ -22,12 +22,17 @@ export const useTimerController = () => {
     }, [state, currentTime]);
 
     const handleTriggerStart = () => {
-        const currState = useTimerStore.getState().state;
-        if (currState === 'IDLE' || currState === 'STOPPED') {
-            if (currState === 'STOPPED') resetTimer();
-            useTimerStore.getState().setState('READY');
-        } else if (currState === 'SOLVING') {
-            stopSolve();
+        const { state, splitMode, markSplit, stopSolve, setState, resetTimer } = useTimerStore.getState();
+        
+        if (state === 'IDLE' || state === 'STOPPED') {
+            if (state === 'STOPPED') resetTimer();
+            setState('READY');
+        } else if (state === 'SOLVING') {
+            if (splitMode) {
+                markSplit();
+            } else {
+                stopSolve();
+            }
         }
     };
 

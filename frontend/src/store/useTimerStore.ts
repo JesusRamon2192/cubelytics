@@ -19,6 +19,7 @@ interface TimerStore {
     currentTime: number;
 
     // Splits
+    splitMode: boolean;
     currentPhase: Phase;
     crossTime: number | null;
     f2lTime: number | null;
@@ -27,6 +28,7 @@ interface TimerStore {
 
     // Actions
     setState: (s: TimerState) => void;
+    toggleSplitMode: () => void;
     nextScramble: () => void;
     startInspection: () => void;
     startSolve: () => void;
@@ -52,6 +54,7 @@ export const useTimerStore = create<TimerStore>((set, get) => ({
     inspectionStart: 0,
     currentTime: 0,
 
+    splitMode: localStorage.getItem('splitMode') === 'true',
     currentPhase: 'CROSS',
     crossTime: null,
     f2lTime: null,
@@ -59,6 +62,12 @@ export const useTimerStore = create<TimerStore>((set, get) => ({
     pllTime: null,
 
     setState: (s) => set({ state: s }),
+
+    toggleSplitMode: () => {
+        const newMode = !get().splitMode;
+        localStorage.setItem('splitMode', String(newMode));
+        set({ splitMode: newMode });
+    },
 
     nextScramble: async () => {
         const data = await fetchScramble();

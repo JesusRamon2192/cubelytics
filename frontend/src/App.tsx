@@ -5,6 +5,7 @@ import { Stats } from './components/Stats';
 import { HistoricView } from './features/historic/HistoricView';
 import AnalyticsPage from './features/analytics/AnalyticsPage';
 import { ThemeSelector } from './components/ThemeSelector';
+import { SplitToggle } from './components/timer/SplitToggle';
 import { useThemeStore } from './theme/useTheme';
 
 function TimerLayout() {
@@ -64,7 +65,10 @@ function App() {
                 Analytics
               </Link>
             </nav>
-            <ThemeSelector />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <SplitToggle />
+              <ThemeSelector />
+            </div>
           </div>
         </div>
       </header>
