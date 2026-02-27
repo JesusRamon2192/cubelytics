@@ -1,9 +1,11 @@
 // @ts-nocheck
 /* eslint-disable */
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect } from 'react';
 import { useTimerStore } from '../store/useTimerStore';
 import { formatTime } from '../utils/timeFormat';
 import { Trash2 } from 'lucide-react';
+import { useTimerController } from '../hooks/useTimerController';
+import { TimerInteractiveZone } from './timer/TimerInteractiveZone';
 
 export const Timer: React.FC = () => {
     const {
@@ -21,97 +23,38 @@ export const Timer: React.FC = () => {
         fetchStats();
     }, [scramble]);
 
-    const [displayTime, setDisplayTime] = useState(0);
-    const lastToggleTime = useRef(0);
-
-    useEffect(() => {
-        let interval: number;
-        if (state === 'SOLVING') {
-            interval = setInterval(() => {
-                setDisplayTime(Date.now() - useTimerStore.getState().startTime);
-            }, 11);
-        } else if (state === 'STOPPED') {
-            setDisplayTime(currentTime);
-        } else if (state === 'IDLE') {
-            setDisplayTime(0);
-        }
-
-        return () => clearInterval(interval);
-    }, [state, currentTime]);
-
-    useEffect(() => {
-        const handleTimerToggle = () => {
-            const now = Date.now();
-            if (now - lastToggleTime.current < 300) return; // debounce 300ms
-            lastToggleTime.current = now;
-
-            const currState = useTimerStore.getState().state;
-            if (currState === 'IDLE') {
-                startSolve();
-            } else if (currState === 'STOPPED') {
-                resetTimer();
-            } else if (currState === 'SOLVING') {
-                stopSolve();
-            }
-        };
-
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.repeat) return;
-            if (e.code === 'Space') {
-                e.preventDefault();
-                handleTimerToggle();
-            } else if (e.key === 'c' || e.key === 'C') {
-                if (useTimerStore.getState().state === 'SOLVING') {
-                    markSplit();
-                }
-            } else if (e.key === 'Escape') {
-                resetTimer();
-            }
-        };
-
-        const handleTouchStart = (e: TouchEvent) => {
-            const target = e.target as HTMLElement;
-            // Ignore touches on interactive elements (buttons, links, inputs)
-            if (target.closest('button') || target.closest('a') || target.closest('input')) {
-                return;
-            }
-            handleTimerToggle();
-        };
-
-        window.addEventListener('keydown', handleKeyDown);
-        window.addEventListener('touchstart', handleTouchStart, { passive: false });
-        
-        return () => {
-            window.removeEventListener('keydown', handleKeyDown);
-            window.removeEventListener('touchstart', handleTouchStart);
-        };
-    }, []); // remove state dependency from key listeners
+    const { displayTime, handleTriggerStart, handleTriggerEnd } = useTimerController();
 
     return (
         <div className="timer-section">
             <div className="scramble-display">{scramble}</div>
             
-            <div className="timer-layout">
-                <div className="cube-image-container">
-                    {scrambleImage && (
-                        <img 
-                            src={scrambleImage} 
-                            alt="Scramble visualization" 
-                            className="cube-image"
-                        />
-                    )}
+            <TimerInteractiveZone 
+                onTriggerStart={handleTriggerStart} 
+                onTriggerEnd={handleTriggerEnd}
+            >
+                <div className="timer-layout">
+                    <div className="cube-image-container">
+                        {scrambleImage && (
+                            <img 
+                                src={scrambleImage} 
+                                alt="Scramble visualization" 
+                                className="cube-image"
+                            />
+                        )}
+                    </div>
+                    <div className={`time-display ${state === 'READY' ? 'ready' : ''}`}>
+                        {state === 'STOPPED' && solves.length > 0
+                            ? (solves[0].penalty === 'DNF'
+                                ? 'DNF'
+                                : (solves[0].penalty === 'PLUS_TWO'
+                                    ? formatTime(solves[0].totalTimeMillis) + '+'
+                                    : formatTime(solves[0].totalTimeMillis)))
+                            : formatTime(displayTime)}
+                    </div>
+                    <div className="timer-layout-spacer"></div>
                 </div>
-                <div className={`time-display ${state === 'READY' ? 'ready' : ''}`}>
-                    {state === 'STOPPED' && solves.length > 0
-                        ? (solves[0].penalty === 'DNF'
-                            ? 'DNF'
-                            : (solves[0].penalty === 'PLUS_TWO'
-                                ? formatTime(solves[0].totalTimeMillis) + '+'
-                                : formatTime(solves[0].totalTimeMillis)))
-                        : formatTime(displayTime)}
-                </div>
-                <div className="timer-layout-spacer"></div>
-            </div>
+            </TimerInteractiveZone>
 
             {/* Actions for Latest Solve */}
             {state === 'STOPPED' && solves.length > 0 && (
