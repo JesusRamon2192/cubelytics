@@ -134,14 +134,6 @@ export const Timer: React.FC = () => {
                             <td className={currentPhase === 'OLL' ? 'active-cell' : ''} style={{ opacity: currentPhase === 'OLL' || ollTime ? 1 : 0.5 }}>{formatTime(ollTime)}</td>
                             <td className={currentPhase === 'PLL' ? 'active-cell' : ''} style={{ opacity: currentPhase === 'PLL' || pllTime ? 1 : 0.5 }}>{formatTime(pllTime)}</td>
                         </tr>
-                        {stats && stats.totalSolves > 0 && (
-                            <tr className="stats-percentages-row">
-                                <td className="phase-cross">{stats.crossPercentage?.toFixed(1) || 0}%</td>
-                                <td className="phase-f2l">{stats.f2lPercentage?.toFixed(1) || 0}%</td>
-                                <td className="phase-oll">{stats.ollPercentage?.toFixed(1) || 0}%</td>
-                                <td className="phase-pll">{stats.pllPercentage?.toFixed(1) || 0}%</td>
-                            </tr>
-                        )}
                     </tbody>
                 </table>
             </div>
