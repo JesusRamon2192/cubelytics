@@ -14,8 +14,10 @@ export interface ConsistencyData {
 
 interface Props {
     data: ConsistencyData;
+    isMobile?: boolean;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
         return (
@@ -28,28 +30,29 @@ const CustomTooltip = ({ active, payload, label }: any) => {
     return null;
 };
 
-export const ConsistencyHistogram: React.FC<Props> = ({ data }) => {
+export const ConsistencyHistogram: React.FC<Props> = ({ data, isMobile = false }) => {
     return (
         <div style={{ padding: '0 0.5rem', gridColumn: '1 / -1' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                <h3>Consistency (Time Distribution)</h3>
-                <div style={{ display: 'flex', gap: '1rem', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
+                <h3 className={isMobile ? "mobile-chart-title" : ""}>Consistency (Time Distribution)</h3>
+                <div style={{ display: 'flex', gap: '1rem', fontSize: isMobile ? '0.75rem' : '0.9rem', color: 'var(--text-muted)' }}>
                     <span>Std Dev: ±{data.stdDev}s</span>
-                    <span>Variance: {data.variance}s²</span>
+                    <span>Var: {data.variance}s²</span>
                 </div>
             </div>
-            <div style={{ width: '100%', height: 300 }}>
+            <div style={{ width: '100%', height: isMobile ? 150 : 300 }}>
                 <ResponsiveContainer>
                     <BarChart data={data.buckets} margin={{ top: 5, right: 20, bottom: 25, left: 0 }}>
                         <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" vertical={false} />
                         <XAxis 
                             dataKey="range" 
                             stroke="var(--text-muted)" 
-                            tick={{ fontSize: 12 }} 
+                            tick={{ fontSize: isMobile ? 10 : 12 }} 
                             angle={-45} 
                             textAnchor="end"
+                            interval={isMobile ? "preserveStartEnd" : 0}
                         />
-                        <YAxis stroke="var(--text-muted)" allowDecimals={false} width={40} />
+                        {!isMobile && <YAxis stroke="var(--text-muted)" allowDecimals={false} width={40} />}
                         <Tooltip content={<CustomTooltip />} cursor={{ fill: 'var(--bg-hover)' }} />
                         <Bar dataKey="count" fill="var(--primary-color)" radius={[4, 4, 0, 0]} />
                     </BarChart>
