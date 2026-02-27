@@ -32,25 +32,27 @@ function App() {
     <div className="app-container">
       <header className="header">
         <div className="header-container">
-          <div>
+          <div className="brand-container">
             <h1>CubeLytics</h1>
-            <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>CFOP Training</div>
+            <div className="brand-subtitle">CFOP Training</div>
           </div>
-          <nav className="nav-links">
-            <Link 
-              to="/" 
-              className={`nav-link ${!isAnalytics ? 'active' : 'inactive'}`}
-            >
-              Timer
-            </Link>
-            <Link 
-              to="/analytics" 
-              className={`nav-link ${isAnalytics ? 'active' : 'inactive'}`}
-            >
-              Analytics
-            </Link>
+          <div className="nav-controls">
+            <nav className="nav-links">
+              <Link 
+                to="/" 
+                className={`nav-link ${!isAnalytics ? 'active' : 'inactive'}`}
+              >
+                Timer
+              </Link>
+              <Link 
+                to="/analytics" 
+                className={`nav-link ${isAnalytics ? 'active' : 'inactive'}`}
+              >
+                Analytics
+              </Link>
+            </nav>
             <ThemeSelector />
-          </nav>
+          </div>
         </div>
       </header>
 
