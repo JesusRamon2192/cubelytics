@@ -129,7 +129,6 @@ export const useTimerStore = create<TimerStore>((set, get) => ({
         const totalTimeMillis = Date.now() - startTime;
         set({ state: 'STOPPED', currentTime: totalTimeMillis });
 
-        // Save solve
         const dto: CreateSolveDto = {
             scramble,
             totalTimeMillis,
@@ -139,7 +138,6 @@ export const useTimerStore = create<TimerStore>((set, get) => ({
             pllTimeMillis: pllTime || undefined,
         };
 
-        // Optimistic local save
         const tempSolve: Solve = {
             id: `temp-${Date.now()}`,
             scramble,
@@ -154,14 +152,21 @@ export const useTimerStore = create<TimerStore>((set, get) => ({
 
         set((state) => ({ solves: [tempSolve, ...state.solves] }));
 
-        try {
-            await apiClient.post('/api/v1/solves', dto);
-            await get().fetchSolves();
-            await get().fetchStats();
-        } catch (e) {
-            console.error("Failed to save solve", e);
-            // Revert optimistic save on failure
-            set((state) => ({ solves: state.solves.filter(s => s.id !== tempSolve.id) }));
+        if (localStorage.getItem('token')) {
+            try {
+                await apiClient.post('/api/v1/solves', dto);
+                await get().fetchSolves();
+                await get().fetchStats();
+            } catch (e) {
+                console.error("Failed to save solve", e);
+                set((state) => ({ solves: state.solves.filter(s => s.id !== tempSolve.id) }));
+            }
+        } else {
+            // Guest Mode
+            const cache = JSON.parse(localStorage.getItem('guest_solves_cache') || '[]');
+            cache.unshift(tempSolve);
+            localStorage.setItem('guest_solves_cache', JSON.stringify(cache));
+            get().fetchSolves();
         }
     },
 
@@ -179,15 +184,24 @@ export const useTimerStore = create<TimerStore>((set, get) => ({
     },
 
     fetchSolves: async () => {
-        try {
-            const data = await apiClient.get('/api/v1/solves?size=50');
-            set({ solves: data.content });
-        } catch (e) {
-            console.error("Failed to fetch solves", e);
+        if (localStorage.getItem('token')) {
+            try {
+                const data = await apiClient.get('/api/v1/solves?size=50');
+                set({ solves: data.content });
+            } catch (e) {
+                console.error("Failed to fetch solves", e);
+            }
+        } else {
+            const cache = JSON.parse(localStorage.getItem('guest_solves_cache') || '[]');
+            set({ solves: cache });
         }
     },
 
     fetchStats: async () => {
+        if (!localStorage.getItem('token')) {
+            set({ stats: null }); // Basic local stats could be generated here in the future
+            return;
+        }
         try {
             const data = await apiClient.get('/api/v1/stats');
             set({ stats: data });
@@ -197,30 +211,43 @@ export const useTimerStore = create<TimerStore>((set, get) => ({
     },
 
     deleteSolve: async (id: string) => {
-        // Optimistic UI update
         const previousSolves = get().solves;
         set({ solves: previousSolves.filter(s => s.id !== id) });
 
-        try {
-            if (!id.startsWith('temp-')) {
-                await apiClient.delete(`/api/v1/solves/${id}`);
+        if (localStorage.getItem('token')) {
+            try {
+                if (!id.startsWith('temp-')) {
+                    await apiClient.delete(`/api/v1/solves/${id}`);
+                }
+                await get().fetchSolves();
+                await get().fetchStats();
+            } catch (e) {
+                console.error("Failed to delete solve", e);
+                set({ solves: previousSolves });
             }
-            await get().fetchSolves();
-            await get().fetchStats();
-        } catch (e) {
-            console.error("Failed to delete solve", e);
-            // Revert on failure
-            set({ solves: previousSolves });
+        } else {
+            const cache = previousSolves.filter(s => s.id !== id);
+            localStorage.setItem('guest_solves_cache', JSON.stringify(cache));
         }
     },
 
     updatePenalty: async (id: string, penalty: Penalty) => {
-        try {
-            await apiClient.patch(`/api/v1/solves/${id}/penalty?penalty=${penalty}`);
-            await get().fetchSolves();
-            await get().fetchStats();
-        } catch (e) {
-            console.error("Failed to update penalty", e);
+        if (localStorage.getItem('token')) {
+            try {
+                await apiClient.patch(`/api/v1/solves/${id}/penalty?penalty=${penalty}`);
+                await get().fetchSolves();
+                await get().fetchStats();
+            } catch (e) {
+                console.error("Failed to update penalty", e);
+            }
+        } else {
+            const cache = JSON.parse(localStorage.getItem('guest_solves_cache') || '[]');
+            const index = cache.findIndex((s: Solve) => s.id === id);
+            if (index !== -1) {
+                cache[index].penalty = penalty;
+                localStorage.setItem('guest_solves_cache', JSON.stringify(cache));
+                get().fetchSolves();
+            }
         }
     }
 

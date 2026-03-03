@@ -21,6 +21,10 @@ spring:
 server:
   port: 8080
 
+jwt:
+  secret: ${JWT_SECRET:super_secret_default_key_that_should_be_changed_in_production_so_it_needs_to_be_at_least_256_bits_long}
+  expiration: 86400000 # 24 hours in ms
+
 logging:
   level:
     root: INFO

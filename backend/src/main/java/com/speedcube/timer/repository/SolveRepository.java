@@ -11,4 +11,9 @@ import java.util.UUID;
 @Repository
 public interface SolveRepository extends JpaRepository<Solve, UUID> {
     Page<Solve> findAllByOrderByTimestampDesc(Pageable pageable);
+
+    Page<Solve> findAllByUserIdOrderByTimestampDesc(UUID userId, Pageable pageable);
+
+    // For migration or getting all stats
+    Iterable<Solve> findAllByUserId(UUID userId);
 }

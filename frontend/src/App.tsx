@@ -7,6 +7,11 @@ import AnalyticsPage from './features/analytics/AnalyticsPage';
 import { ThemeSelector } from './components/ThemeSelector';
 import { SplitToggle } from './components/timer/SplitToggle';
 import { useThemeStore } from './theme/useTheme';
+import { useAuth } from './features/auth/AuthContext';
+import { Login } from './features/auth/Login';
+import { Register } from './features/auth/Register';
+import { ProtectedRoute } from './features/auth/ProtectedRoute';
+import { AdminPanel } from './features/admin/AdminPanel';
 
 function TimerLayout() {
   return (
@@ -31,6 +36,7 @@ function App() {
   const location = useLocation();
   const currentPath = location.pathname;
   const { initTheme } = useThemeStore();
+  const { user, logout } = useAuth();
 
   useEffect(() => {
     initTheme();
@@ -42,7 +48,10 @@ function App() {
         <div className="header-container">
           <div className="brand-container">
             <h1>CubeLytics</h1>
-            <div className="brand-subtitle">CFOP Training</div>
+            <div className="brand-subtitle" style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+              CFOP Training
+              {!user && <span style={{ fontSize: '0.7rem', background: 'var(--accent)', color: 'white', padding: '2px 6px', borderRadius: '4px' }}>Guest Mode</span>}
+            </div>
           </div>
           <div className="nav-controls">
             <nav className="nav-links">
@@ -64,10 +73,23 @@ function App() {
               >
                 Analytics
               </Link>
+              {user?.role === 'ADMIN' && (
+                <Link 
+                  to="/admin" 
+                  className={`nav-link ${currentPath === '/admin' ? 'active' : 'inactive'}`}
+                >
+                  Admin
+                </Link>
+              )}
             </nav>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
               <SplitToggle />
               <ThemeSelector />
+              {user ? (
+                <button onClick={logout} style={{ padding: '0.4rem 0.8rem', background: 'transparent', border: '1px solid var(--border)', color: 'var(--text-secondary)', borderRadius: '4px', cursor: 'pointer' }}>Logout</button>
+              ) : (
+                <Link to="/login" style={{ padding: '0.4rem 0.8rem', background: 'var(--accent)', color: 'white', borderRadius: '4px', textDecoration: 'none', fontSize: '0.9rem' }}>Login</Link>
+              )}
             </div>
           </div>
         </div>
@@ -75,6 +97,13 @@ function App() {
 
       <main className="main-content">
         <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/admin" element={
+            <ProtectedRoute requiredRole="ADMIN">
+              <AdminPanel />
+            </ProtectedRoute>
+          } />
           <Route path="/" element={<TimerLayout />} />
           <Route path="/historic" element={<HistoricLayout />} />
           <Route path="/analytics" element={<AnalyticsPage />} />
