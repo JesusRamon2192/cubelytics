@@ -2,6 +2,8 @@
 
 CubeLytics es una aplicación web profesional orientada al _speedcubing_, diseñada específicamente para el entrenamiento del método CFOP con la capacidad de registrar splits manuales por fase (Cross, F2L, OLL, PLL).
 
+![Página Principal](./screenshots/pagina-principal.png)
+
 Este proyecto está construido con un enfoque full-stack que incluye un frontend moderno e interactivo y un backend robusto apoyado por una base de datos relacional para el registro histórico y estadísticas, todo fácilmente desplegable mediante Docker.
 
 ## Características Principales
@@ -10,7 +12,13 @@ Este proyecto está construido con un enfoque full-stack que incluye un frontend
 - **Generador de Scrambles WCA**: Generación de mezclas aleatorias que cumplen con la normativa de la World Cube Association.
 - **Entrenamiento Analítico (Splits CFOP)**: Sistema innovador para medir el tiempo de cada fase del método CFOP manualmente.
 - **Estadísticas Detalladas**: Cálculo de promedios locales como Ao5, Ao12 y visualización de gráficos de progreso para observar tu mejora en el tiempo.
+
+  ![Estadísticas](./screenshots/analitycs.png)
+
 - **Historial Editable**: Registro de todos los tiempos ("cube assemblies") realizados, donde puedes revisar, editar o eliminar resoluciones previas.
+
+  ![Histórico](./screenshots/historico.png)
+
 - **Despliegue Sencillo**: Todo el entorno está contenedorizado para poder levantarse con un solo comando.
 
 ## Tecnologías Utilizadas
