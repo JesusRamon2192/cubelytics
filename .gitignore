@@ -91,6 +91,11 @@ oauth.json
 *.db
 *.db-journal
 
+# Ignore all SQL files (backups, dumps, etc.)
+*.sql
+# But do not ignore backend migration scripts
+!backend/src/main/resources/db/migration/*.sql
+
 # Compiled/temporary output seen in the repo
 backend/compile_output.txt
 
